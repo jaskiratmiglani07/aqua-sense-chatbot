@@ -90,17 +90,16 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         
-        // --- YOUR UNIQUE URL HAS BEEN INSERTED HERE ---
-        const BRAIN_URL = 'https://aqua-sense-chatbot.vercel.app/api';
+        // This is a placeholder that we will fill in AFTER we deploy to Vercel
+        const BRAIN_URL = 'PASTE_YOUR_VERCEL_URL_HERE/api'; 
 
         let conversationHistory = [];
 
         function displayMessage(message, sender, isThinking = false) {
-            // This is a simple markdown renderer. Using a library like 'marked.js' would be better for a real product.
             let formattedMessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Bold
-            formattedMessage = formattedMessage.replace(/&bull;/g, '•'); // Bullets
-            formattedMessage = formattedMessage.replace(/\n/g, '<br>'); // Newlines
+            formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            formattedMessage = formattedMessage.replace(/&bull;/g, '•');
+            formattedMessage = formattedMessage.replace(/\n/g, '<br>');
 
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-message', `${sender}-message`);
@@ -120,9 +119,8 @@
         }
 
         async function getAIResponse(question) {
-            // This line now correctly checks for the placeholder text
-            if (!BRAIN_URL || BRAIN_URL.includes('PASTE_YOUR_REPLIT_URL_HERE')) {
-                displayMessage("Configuration error: The BRAIN_URL is not set correctly in the HTML file.", 'bot');
+            if (!BRAIN_URL || BRAIN_URL.includes('PASTE_YOUR_VERCEL_URL_HERE')) {
+                displayMessage("Configuration error: The Vercel URL is not set correctly in this file.", 'bot');
                 return;
             }
 
@@ -142,9 +140,7 @@
                     chatBox.removeChild(thinkingMessage);
                 }
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-                }
+                if (!response.ok) { throw new Error(`API Error`); }
 
                 const data = await response.json();
                 const aiAnswer = data.answer;
@@ -155,34 +151,26 @@
                 conversationHistory.push({ role: "model", parts: [{ text: aiAnswer }] });
 
             } catch (error) {
-                console.error("Failed to get AI response:", error);
-                if (document.getElementById('thinking')) {
-                    chatBox.removeChild(document.getElementById('thinking'));
-                }
-                displayMessage("Sorry, I'm having trouble connecting to my brain right now. Please check that the Replit server is running and the URL is correct.", 'bot');
+                displayMessage("Sorry, I'm having trouble connecting to my brain right now. Please check that your Vercel deployment was successful.", 'bot');
             }
         }
 
         function handleSend() {
             const userInputText = userInput.value;
             if (userInputText.trim() === '') return;
-
             displayMessage(userInputText, 'user');
             getAIResponse(userInputText);
-
             userInput.value = '';
             userInput.focus();
         }
 
         sendBtn.addEventListener('click', handleSend);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSend();
-            }
+            if (e.key === 'Enter') { handleSend(); }
         });
 
         window.onload = () => {
-             setTimeout(() => displayMessage("Hello! I'm Aqua-Sense. My intelligence is now powered by Google's Gemini model, running on a custom server. Ask me anything about water conservation or SDG 6.", 'bot'), 500);
+             setTimeout(() => displayMessage("Hello! I'm Aqua-Sense. Ask me anything about water conservation or SDG 6.", 'bot'), 500);
         };
     </script>
 </body>
