@@ -1,7 +1,7 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize the AI model from Environment Variables
-const API_KEY = process.env.GEMINI_API_KEY; 
+const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -21,38 +21,34 @@ const systemPrompt = `
     8.  **The Layered Response System:** You must continue to structure your answers with a Direct Answer, Contextual Expansion, and a Proactive Engagement question, as this is your core coaching method.
 `;
 
-// This is the main function Vercel will run
-module.exports = async (req, res) => {
-    // Set CORS headers to allow your frontend to talk to this backend
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(req, res) {
+  // Set CORS headers to allow your frontend to talk to this backend
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Handle the browser's preflight request
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-  
+  // Handle the browser's preflight request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
     const { question, history } = req.body;
-
     if (!question) {
       return res.status(400).json({ error: 'Question is required.' });
     }
-    
+
     const chat = model.startChat({
       history: history || [],
     });
-
     const fullPrompt = `${systemPrompt}\n\nHere is the user's question: "${question}"`;
-
     const result = await chat.sendMessage(fullPrompt);
     const responseText = result.response.text();
-    
-    res.status(200).json({ answer: responseText });
 
+    res.status(200).json({ answer: responseText });
   } catch (error) {
     console.error('AI Error:', error);
     res.status(500).json({ error: 'Failed to get response from AI.' });
   }
-};
+}
+
