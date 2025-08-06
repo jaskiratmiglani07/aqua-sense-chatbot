@@ -1,5 +1,11 @@
 {
+  "name": "genapi",
+  "version": "1.0.0",
+  "type": "module",
   "engines": {
     "node": "18.x"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.3.0"
   }
 }
